@@ -28,7 +28,6 @@ def ask(question: str) -> str:
     global history
     client = genai.Client(api_key=get_api_key())
     history.append(types.Content(role="user",parts=[types.Part(text=question)]))
-    print(history)
     response = client.models.generate_content(model=MODEL, contents=history)
     answer = response.text
     history.append(types.Content(role="model",parts=[types.Part(text=answer)]))
@@ -54,7 +53,7 @@ def main() -> None:
         print(api_error_message(e.code, e.message))
         raise SystemExit(1)
     
-    print("履歴保存し次の質問へ: /exit")
+    print("終了: /exit")
     print("履歴削除: /clear")
     print(f"履歴数: {len(history)}")
 
