@@ -29,8 +29,7 @@ def ask(question: str) -> str:
     history.append({"role": "user","parts": [{"text": question}],})
     response = client.models.generate_content(model=MODEL, contents=history)
     answer = response.text
-    history.append({"role": "user","parts": [{"text": answer}],})
-
+    history.append({"role": "model","parts": [{"text": answer}],})
 
     # TODO(第1回 演習): response.usage_metadata から
     #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
@@ -64,7 +63,10 @@ def main() -> None:
             continue
         if question == "/exit":
             break
-
+        try:
+            print(ask(question))
+        except errors.APIError as e:
+            print(api_error_message(e.code, e.message))
 
 if __name__ == "__main__":
     main()
