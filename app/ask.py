@@ -26,11 +26,11 @@ history = []
 def ask(question: str) -> str:
     global history
     client = genai.Client(api_key=get_api_key())
-    history.append({"role": "user","parts": [{"text": question}],})
+    history.append(role="user",parts=[type.Part(text=question)])
     print(history)
     response = client.models.generate_content(model=MODEL, contents=history)
     answer = response.text
-    history.append({"role": "model","parts": [{"text": answer}],})
+    history.append(role="model",parts=[type.Part(text=answer)])
 
     # TODO(第1回 演習): response.usage_metadata から
     #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
@@ -55,6 +55,7 @@ def main() -> None:
     
     print("履歴保存し次の質問へ: /exit")
     print("履歴削除: /clear")
+    print(f"履歴数: {len(history)}")
 
     while True:
         question = input("\n> ")
