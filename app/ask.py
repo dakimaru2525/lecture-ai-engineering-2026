@@ -14,19 +14,28 @@ import argparse
 
 from google import genai
 from google.genai import errors
+from google.genai import types
 
 from app.config import MODEL, api_error_message, get_api_key
 
 # 講座に固有の質問。正しい答えは data/glossary.json の homework-levels にある
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
+#会話履歴
+history = []
 
 def ask(question: str) -> str:
+    global history
     client = genai.Client(api_key=get_api_key())
-    response = client.models.generate_content(model=MODEL, contents=question)
+    history.append(types.Content(role="user",parts=[types.Part(text=question)]))
+    response = client.models.generate_content(model=MODEL, contents=history)
+    answer = response.text
+    history.append(types.Content(role="model",parts=[types.Part(text=answer)]))
 
     # TODO(第1回 演習): response.usage_metadata から
     #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
+    print(f"入力トークン : {response.usage_metadata.prompt_token_count}")
+    print(f"出力トークン: {response.usage_metadata.candidates_token_count}")
 
     return response.text
 
@@ -40,10 +49,28 @@ def main() -> None:
     print(f"[質問] {args.question}\n")
     try:
         print(ask(args.question))
+        print("終了: /exit")
+        print("履歴削除: /clear")
+        print(f"履歴数: {len(history)}")
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))
+        print("終了: /exit")
+        print("履歴削除: /clear")
+        print(f"履歴数: {len(history)}")
         raise SystemExit(1)
-
+    
+    while True:
+        question = input("\n> ")
+        if question == "/clear":
+            history.clear()
+            print("履歴を削除しました")
+            continue
+        if question == "/exit":
+            break
+        try:
+            print(ask(question))
+        except errors.APIError as e:
+            print(api_error_message(e.code, e.message))
 
 if __name__ == "__main__":
     main()
