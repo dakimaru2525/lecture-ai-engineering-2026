@@ -52,12 +52,18 @@ def main() -> None:
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))
         raise SystemExit(1)
+    
+    print("履歴保存し次の質問へ: /exit")
     print("履歴削除: /clear")
+
     while True:
         question = input("\n> ")
         if question == "/clear":
             history.clear()
+            print("履歴を削除しました")
             continue
+        if question == "/exit":
+            break
 
 
 if __name__ == "__main__":
