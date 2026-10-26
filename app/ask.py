@@ -49,14 +49,16 @@ def main() -> None:
     print(f"[質問] {args.question}\n")
     try:
         print(ask(args.question))
+        print("終了: /exit")
+        print("履歴削除: /clear")
+        print(f"履歴数: {len(history)}")
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))
+        print("終了: /exit")
+        print("履歴削除: /clear")
+        print(f"履歴数: {len(history)}")
         raise SystemExit(1)
     
-    print("終了: /exit")
-    print("履歴削除: /clear")
-    print(f"履歴数: {len(history)}")
-
     while True:
         question = input("\n> ")
         if question == "/clear":
