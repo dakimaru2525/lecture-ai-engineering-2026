@@ -27,6 +27,7 @@ def ask(question: str) -> str:
     global history
     client = genai.Client(api_key=get_api_key())
     history.append({"role": "user","parts": [{"text": question}],})
+    print(history)
     response = client.models.generate_content(model=MODEL, contents=history)
     answer = response.text
     history.append({"role": "model","parts": [{"text": answer}],})
