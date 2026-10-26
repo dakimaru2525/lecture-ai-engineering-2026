@@ -20,10 +20,17 @@ from app.config import MODEL, api_error_message, get_api_key
 # 講座に固有の質問。正しい答えは data/glossary.json の homework-levels にある
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
+#会話履歴
+history = []
 
 def ask(question: str) -> str:
+    global history
     client = genai.Client(api_key=get_api_key())
-    response = client.models.generate_content(model=MODEL, contents=question)
+    history.append({"role": "user","parts": [{"text": question}],})
+    response = client.models.generate_content(model=MODEL, contents=history)
+    answer = response.text
+    history.append({"role": "user","parts": [{"text": answer}],})
+
 
     # TODO(第1回 演習): response.usage_metadata から
     #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
@@ -45,6 +52,12 @@ def main() -> None:
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))
         raise SystemExit(1)
+    print("履歴削除: /clear")
+    while True:
+        question = input("\n> ")
+        if question == "/clear":
+            history.clear()
+            continue
 
 
 if __name__ == "__main__":
