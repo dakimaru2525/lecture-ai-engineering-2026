@@ -14,6 +14,7 @@ import argparse
 
 from google import genai
 from google.genai import errors
+from google.genai import types
 
 from app.config import MODEL, api_error_message, get_api_key
 
@@ -26,11 +27,11 @@ history = []
 def ask(question: str) -> str:
     global history
     client = genai.Client(api_key=get_api_key())
-    history.append(role="user",parts=[type.Part(text=question)])
+    history.append(types.Content(role="user",parts=[types.Part(text=question)]))
     print(history)
     response = client.models.generate_content(model=MODEL, contents=history)
     answer = response.text
-    history.append(role="model",parts=[type.Part(text=answer)])
+    history.append(types.Content(role="model",parts=[types.Part(text=answer)]))
 
     # TODO(第1回 演習): response.usage_metadata から
     #   入力トークン数と出力トークン数を表示してみよう（Copilotに頼んでよい）
